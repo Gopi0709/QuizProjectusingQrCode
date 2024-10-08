@@ -23,6 +23,7 @@
         <button class="answer-btn" data-id="3">D</button>
       </div>
     </div>
+    <div id="player-list"></div> <!-- Player names will be shown here -->
   </div>
 
   <!-- Mobile Join View -->
@@ -48,8 +49,14 @@
       // Handle player joining
       document.getElementById('join-btn').onclick = function () {
         const playerName = document.getElementById('player-name').value;
-        window.opener.playerJoin(playerName);  // Send player's name to the main screen
-        window.close();  // Close the mobile screen after joining
+        
+        // Store player's name in localStorage
+        localStorage.setItem('playerName', playerName);
+
+        alert('You have joined the game!');
+
+        // Optionally, you can close the mobile window after join (if opened via window.open)
+        window.close(); 
       };
     } else {
       // Show the main screen and generate the QR code
@@ -84,10 +91,20 @@
 
       const questionElement = document.getElementById('question');
       const answerButtons = Array.from(document.querySelectorAll('.answer-btn'));
+      const playerListElement = document.getElementById('player-list');
+
+      // On page load, check for new player join from localStorage
+      window.addEventListener('storage', function (event) {
+        if (event.key === 'playerName') {
+          const playerName = event.newValue;
+          playerJoin(playerName);
+        }
+      });
 
       // On player join, store their name and show the first question if no other players
       function playerJoin(playerName) {
         players.push(playerName);
+        playerListElement.innerHTML += `<p>${playerName} has joined the game!</p>`;
         if (players.length === 1) {
           showQuestion();
         }
